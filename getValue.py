@@ -1,0 +1,5 @@
+data = []
+
+
+
+print(len(data))
