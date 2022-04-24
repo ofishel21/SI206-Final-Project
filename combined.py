@@ -14,6 +14,8 @@ path = os.path.dirname(os.path.abspath(__file__))
 conn = sqlite3.connect(path+'/'+'finaldb.db')
 cur = conn.cursor()
 
+cur.execute('CREATE TABLE IF NOT EXISTS restaurants (restaurantName TEXT, rating INTEGER, ratingCount INTEGER)')
+
 
 def addtodb(n,r,rc):
     cur.execute(
@@ -81,16 +83,6 @@ for x in range(4):
         id += 1
         conn.commit()
 
-from bs4 import BeautifulSoup
-import requests
-import re
-import json
-import sqlite3
-import os
-
-
-conn = sqlite3.connect("company.db")
-cur = conn.cursor()
 
 URL = "https://api.foursquare.com/v3/places/search?ll=41.8781%2C-87.6298&query=restaurant&categories=13000&fields=rating,name,stats&limit=50&radius=7000"
 
