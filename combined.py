@@ -4,65 +4,69 @@ import sqlite3
 import os
 import json
 
-class getValue:
-    data = []
-    print(len(data))
-
-j = 1
-
 path = os.path.dirname(os.path.abspath(__file__))
-conn = sqlite3.connect(path+'/'+'finaldb.db')
+conn = sqlite3.connect(path+'/'+'206Project.db')
 cur = conn.cursor()
-
-cur.execute('CREATE TABLE IF NOT EXISTS restaurants (restaurantName TEXT, rating INTEGER, ratingCount INTEGER)')
-
+cur.execute('CREATE TABLE IF NOT EXISTS restaurants (restaurantName TEXT, rating INTEGER, reviewCount INTEGER)')
 
 def addtodb(n,r,rc):
-    cur.execute(
-        "INSERT INTO restaurants (restaurantName, rating, ratingCount) VALUES (?,?,?)", (n,r,rc))
+    for i in range(len(n)):
+        cur.execute("INSERT INTO restaurants (restaurantName, rating, reviewCount) VALUES (?,?,?)", (rc[i],n[i],r[i]))
+        conn.commit()
 
-def getname(name):
-    try:
-        if len(name) == 0:
-            return "Name not defined"
-        return name[3].text
-    except IndexError:
-        return "Name not defined"
+    
 
-def getRating(ratValue):
-    if len(ratValue) == 0:
-        return ""
-    else:
-        return ratValue[0].get("content")
+name_list = []
+rating_list = []
+reviews_list = []
 
 
-for i in getValue.data:
-    curl = "https://www.yellowpages.com/search?search_terms=restaurants&geo_location_terms=Ann+Arbor%2C+MI" + i
-    req = requests.get(curl)
-    soup = BeautifulSoup(req.content, "html.parser")
+def extract(url):
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'}
+    r = requests.get(url, headers=headers)
+    soup = BeautifulSoup(r.content, 'html.parser')
+    return soup.find_all('div', class_ = 'hInfo vcard')
 
-    # get name of company
-    cName = soup.find_all("span", {"itemprop": "name"})
-    cName = getname(cName)
-
-    # get company rating
-    cRatV = soup.find_all("meta", {"itemprop": "ratingValue"})
-    cRatV = getRating(cRatV)
-
-    # get company rating count   
-    cRatC = soup.find_all("meta", {"itemprop": "reviewCount"})
-    cRatC = getRating(cRatC)
+def names(businesses):
+    for x in businesses:
+        name = x.find('a', class_ = "url org").text
+        name_list.append(name)
+    return name_list
 
 
-    addtodb(j, cName, cRatV, cRatC, curl)
+def ratings(businesses):
+    for x in businesses:
+        rating = x.find('span', class_ = 'rateVal').text
+        rating_list.append(rating)
+    return rating_list
 
-    print("Acquired restaurant data")
-    j += 1
-    conn.commit()
+def reviews(businesses):
+    for x in businesses:
+        try:
+            bizReviews = x.find('div', class_ = 'reviewsWrap')
+            reviews = bizReviews.find('a', class_ = 'reviewsQty').text[0]
+        except:
+            reviews = ''
+        reviews_list.append(reviews)
+    return reviews_list
+
+for x in range(0,135,15):
+    businesses = extract(f'https://www.merchantcircle.com/mi-ann-arbor/food-and-dining/restaurants?start={x}#hubResults')
+    a = ratings(businesses)
+    b = reviews(businesses)
+    c = names(businesses)
+    
+addtodb(a,b,c)
+
+
+print("program finished")
 
 cur.execute("CREATE TABLE IF NOT EXISTS RestaurantRatings (id INTEGER PRIMARY KEY, rating FLOAT, numberOfRatings INTEGER)")
 cur.execute("CREATE TABLE IF NOT EXISTS RestaurantName (id INTEGER PRIMARY KEY, name TEXT)")
 conn.commit()
+
+
+
 
 count = 0
 id = 0
@@ -82,6 +86,9 @@ for x in range(4):
         cur.execute("INSERT OR IGNORE INTO RestaurantRatings (id,rating, numberOfRatings) VALUES (?,?,?)",(id,rating,reviewNum))
         id += 1
         conn.commit()
+
+
+
 
 
 URL = "https://api.foursquare.com/v3/places/search?ll=41.8781%2C-87.6298&query=restaurant&categories=13000&fields=rating,name,stats&limit=50&radius=7000"
@@ -139,37 +146,45 @@ group6= restaurants3[25:]
 
 
 
-cur.execute('CREATE TABLE IF NOT EXISTS Ratings (name TEXT PRIMARY KEY, rating INTEGER, total_ratings INTEGER)')
+cur.execute('CREATE TABLE IF NOT EXISTS Ratings (name TEXT PRIMARY KEY, rating FLOAT, total_ratings INTEGER)')
 for restaurant in group1:
    name = restaurant['name']
    rating = restaurant['rating']
+   rating = rating/2
    totratings = restaurant['stats']['total_ratings']
    cur.execute('INSERT OR IGNORE INTO Ratings (name, rating, total_ratings) VALUES (?,?,?)', (name, rating, totratings))
 for restaurant in group2:
    name = restaurant['name']
    rating = restaurant['rating']
+   rating = rating/2
    totratings = restaurant['stats']['total_ratings']
    cur.execute('INSERT OR IGNORE INTO Ratings (name, rating, total_ratings) VALUES (?,?,?)', (name, rating, totratings))
 for restaurant in group3:
    name = restaurant['name']
    rating = restaurant['rating']
+   rating = rating/2
    totratings = restaurant['stats']['total_ratings']
    cur.execute('INSERT OR IGNORE INTO Ratings (name, rating, total_ratings) VALUES (?,?,?)', (name, rating, totratings))
 for restaurant in group4:
    name = restaurant['name']
    rating = restaurant['rating']
+   rating = rating/2
    totratings = restaurant['stats']['total_ratings']
    cur.execute('INSERT OR IGNORE INTO Ratings (name, rating, total_ratings) VALUES (?,?,?)', (name, rating, totratings))
 for restaurant in group5:
    name = restaurant['name']
    rating = restaurant['rating']
+   rating = rating/2
    totratings = restaurant['stats']['total_ratings']
    cur.execute('INSERT OR IGNORE INTO Ratings (name, rating, total_ratings) VALUES (?,?,?)', (name, rating, totratings))
 for restaurant in group6:
    name = restaurant['name']
    rating = restaurant['rating']
+   rating = rating/2
    totratings = restaurant['stats']['total_ratings']
    cur.execute('INSERT OR IGNORE INTO Ratings (name, rating, total_ratings) VALUES (?,?,?)', (name, rating, totratings))
 
 conn.commit()
+
 conn.close()
+
