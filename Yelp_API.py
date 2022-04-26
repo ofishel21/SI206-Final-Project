@@ -7,7 +7,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-conn = sqlite3.connect("company.db")
+path = os.path.dirname(os.path.abspath(__file__))
+conn = sqlite3.connect(path+'/'+'206Project.db')
 cur = conn.cursor()
 
 cur.execute("CREATE TABLE IF NOT EXISTS RestaurantRatings (id INTEGER PRIMARY KEY, rating FLOAT, numberOfRatings INTEGER)")

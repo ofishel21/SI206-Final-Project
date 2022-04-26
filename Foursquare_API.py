@@ -7,7 +7,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-conn = sqlite3.connect("SIFinalDB.db")
+path = os.path.dirname(os.path.abspath(__file__))
+conn = sqlite3.connect(path+'/'+'206Project.db')
 cur = conn.cursor()
 
 URL = "https://api.foursquare.com/v3/places/search?ll=41.8781%2C-87.6298&query=restaurant&categories=13000&fields=rating,name,stats&limit=50&radius=7000"
