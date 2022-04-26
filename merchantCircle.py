@@ -53,7 +53,11 @@ for x in range(0,135,15):
     b = reviews(businesses)
     c = names(businesses)
     
-    addtodb(a,b,c)
+addtodb(a,b,c)
+
+
+
+
 
 con.close()
 print("program finished")
