@@ -108,21 +108,24 @@ conn.commit()
 
 conn.close()
 
-#Visualization#
+#Foursquare API Visualization#
+
+import numpy as np
+import matplotlib.pyplot as plt
  
   
 # creating the dataset
-data = {'#1 4.7': 517, '#2 4.7': 283, '#3 4.65': 139, '#4 4.6': 108, '#5 4.5': 108, '#124 3.55': 23, '#125 3.55': 32, '#126 3.5': 16, '#127 3.5': 3, '#128 3.5': 3}
-average_rating = list(data.keys())
+data = {'1/4.7': 517, '2/4.7': 283, '3/4.65': 139, '4/4.6': 108, '5/4.5': 108, '124/3.55': 23, '125/3.55': 32, '126/3.5': 16, '127/3.5': 3, '128/3.5': 3}
+rating = list(data.keys())
 total_ratings = list(data.values())
   
 fig = plt.figure(figsize = (10, 5))
  
 # creating the bar plot
-plt.bar(average_rating, total_ratings, color ='green',
+plt.bar(rating, total_ratings, color ='green',
         width = 0.5)
  
-plt.xlabel('Rank / Average Rating', fontsize = 15)
+plt.xlabel('Rank / Rating', fontsize = 15)
 plt.ylabel('Rating Count', fontsize = 15)
-plt.title('Average Rating vs. Rating Count in Top 5 vs. Bottom 5 Ranked Restaurants')
+plt.title('Rating vs. Rating Count in Top 5 vs. Bottom 5 Ranked Restaurants')
 plt.show()
