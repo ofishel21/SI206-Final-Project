@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import sqlite3
+import matplotlib.pyplot as plt
+import pandas as pd
 
 con = sqlite3.connect("restaurantdata.db")
 cursor = con.cursor()
@@ -61,6 +63,34 @@ addtodb(a,b,c)
 
 con.close()
 print("program finished")
+
+
+# Visualization
+
+#Font
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.sans-serif'] = 'Helvetica'
+
+# set the style of the axes and the text color
+plt.rcParams['axes.edgecolor']='#333F4B'
+plt.rcParams['axes.linewidth']=0.8
+plt.rcParams['xtick.color']='#333F4B'
+plt.rcParams['ytick.color']='#333F4B'
+plt.rcParams['text.color']='#333F4B'
+
+#Data
+data = {'Average Rating': [4.7,4.6,4.4,3.98,4.2,4,4.2]}
+df = pd.DataFrame(data,columns=['Average Rating'], index = ['1','2','3','4','5','6','7'])
+
+
+#Setting up Horizontal Bar Chart
+df.plot.barh()
+
+
+plt.title('Restaurant Rating Count vs Average Restaurant Rating')
+plt.ylabel('Rating Count')
+plt.xlabel('Average Rating')
+plt.show()
 
 
 
