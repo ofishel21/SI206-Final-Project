@@ -4,6 +4,8 @@ import re
 import json
 import sqlite3
 import os
+import numpy as np
+import matplotlib.pyplot as plt
 
 conn = sqlite3.connect("company.db")
 cur = conn.cursor()
@@ -30,5 +32,49 @@ for x in range(4):
         cur.execute("INSERT OR IGNORE INTO RestaurantRatings (id,rating, numberOfRatings) VALUES (?,?,?)",(id,rating,reviewNum))
         id += 1
         conn.commit()
+
+# Creating dataset
+distrubutiions = ['5.0 - 4.5', '4.5 - 4.0', '4.0 - 3.5']
+ 
+data = [39, 44, 17]
+ 
+ 
+# Creating explode data
+explode = (0.05, 0.1, 0.0)
+ 
+# Creating color parameters
+colors = ( "orange", "cyan", "indigo")
+ 
+# Wedge properties
+wp = { 'linewidth' : 1, 'edgecolor' : "blue" }
+ 
+# Creating autocpt arguments
+def func(pct, allvalues):
+    absolute = int(pct / 100.*np.sum(allvalues))
+    return "{:.1f}%\n({:d} Restaurants)".format(pct, absolute)
+ 
+# Creating plot
+fig, ax = plt.subplots(figsize =(10, 7))
+wedges, texts, autotexts = ax.pie(data,
+                                  autopct = lambda pct: func(pct, data),
+                                  explode = explode,
+                                  labels = distrubutiions,
+                                  shadow = True,
+                                  colors = colors,
+                                  startangle = 90,
+                                  wedgeprops = wp,
+                                  textprops = dict(color = "red"))
+ 
+# Adding legend
+ax.legend(wedges, distrubutiions,
+          title = "Rating Distributions",
+          loc = "center left",
+          bbox_to_anchor =(1, 0, 0.5, 1))
+ 
+plt.setp(autotexts, size = 8, weight = "bold")
+plt.title('Restaurant Rating Distributions', fontsize = 12, weight = "bold")
+ 
+# show plot
+plt.show()
 conn.close()
         
