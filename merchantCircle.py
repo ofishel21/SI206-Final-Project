@@ -61,7 +61,6 @@ addtodb(a,b,c)
 
 con.close()
 print("program finished")
-        
 
 
 
