@@ -107,46 +107,21 @@ conn.commit()
 
 conn.close()
 
-# Creating categories
-distrubutiions = ['5.0 - 4.5', '4.5 - 4.0', '4.0 - 3.5']
+#Visualization#
  
-data = [39, 44, 17]
+  
+# creating the dataset
+data = {'#1 4.7': 517, '#2 4.7': 283, '#3 4.65': 139, '#4 4.6': 108, '#5 4.5': 108, '#124 3.55': 23, '#125 3.55': 32, '#126 3.5': 16, '#127 3.5': 3, '#128 3.5': 3}
+average_rating = list(data.keys())
+total_ratings = list(data.values())
+  
+fig = plt.figure(figsize = (10, 5))
  
+# creating the bar plot
+plt.bar(average_rating, total_ratings, color ='green',
+        width = 0.5)
  
-# Creating explode data
-explode = (0.05, 0.1, 0.0)
- 
-# Creating color parameters
-colors = ( "orange", "cyan", "indigo")
- 
-# Wedge properties
-wp = { 'linewidth' : 1, 'edgecolor' : "blue" }
- 
-# Creating autocpt arguments
-def func(pct, allvalues):
-    absolute = int(pct / 100.*np.sum(allvalues))
-    return "{:.1f}%\n({:d} Restaurants)".format(pct, absolute)
- 
-# Creating plot
-fig, ax = plt.subplots(figsize =(10, 7))
-wedges, texts, autotexts = ax.pie(data,
-                                  autopct = lambda pct: func(pct, data),
-                                  explode = explode,
-                                  labels = distrubutiions,
-                                  shadow = True,
-                                  colors = colors,
-                                  startangle = 90,
-                                  wedgeprops = wp,
-                                  textprops = dict(color = "red"))
- 
-# Adding legend
-ax.legend(wedges, distrubutiions,
-          title = "Rating Distributions",
-          loc = "center left",
-          bbox_to_anchor =(1, 0, 0.5, 1))
- 
-plt.setp(autotexts, size = 8, weight = "bold")
-plt.title('Restaurant Rating Distributions', fontsize = 12, weight = "bold")
- 
-# show plot
+plt.xlabel('Rank / Average Rating', fontsize = 15)
+plt.ylabel('Rating Count', fontsize = 15)
+plt.title('Average Rating vs. Rating Count in Top 5 vs. Bottom 5 Ranked Restaurants')
 plt.show()
