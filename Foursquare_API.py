@@ -6,126 +6,105 @@ import json
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
+import pandas as pd
 
 path = os.path.dirname(os.path.abspath(__file__))
 conn = sqlite3.connect(path+'/'+'206Project.db')
 cur = conn.cursor()
 
-URL = "https://api.foursquare.com/v3/places/search?ll=41.8781%2C-87.6298&query=restaurant&categories=13000&fields=rating,name,stats&limit=50&radius=7000"
+def APIsetup():
 
-headers = {
-    "Accept": "application/json",
-    "Authorization": "fsq3XX8Bpj7/mc5IfDMBIMy3X8NXQszNg8FkBdFPlg3cHaw="
-}
+    URL = "https://api.foursquare.com/v3/places/search?ll=41.8781%2C-87.6298&query=restaurant&categories=13000&fields=rating,name,stats&limit=50&radius=7000"
 
-response = requests.get(url = URL, headers=headers)
-first_responses = (json.loads(response.text))
+    headers = {
+        "Accept": "application/json",
+        "Authorization": "fsq3XX8Bpj7/mc5IfDMBIMy3X8NXQszNg8FkBdFPlg3cHaw="
+    }
 
-
-URL2 = "https://api.foursquare.com/v3/places/search?ll=41.8781%2C-87.6298&query=restaurant&categories=13000&fields=rating,name,stats&limit=50&radius=60000"
-
-headers2 = {
-    "Accept": "application/json",
-    "Authorization": "fsq3XX8Bpj7/mc5IfDMBIMy3X8NXQszNg8FkBdFPlg3cHaw="
-}
-
-response2 = requests.get(url = URL2, headers=headers2)
-first_responses2 = (json.loads(response2.text))
+    response = requests.get(url = URL, headers=headers)
+    first_responses = (json.loads(response.text))
 
 
-resp_headers = response.headers
-link = resp_headers['Link'][1:76]
-link = link+"41.8781%2C-87.6298&limit=50&fields=rating,name,stats&categories=13000&radius=20000&query=restaurant"
-second_response = requests.get(url = link, headers = headers)
-second_responses = json.loads(second_response.text)
-first_responses = first_responses['results']
-second_responses = second_responses['results']
-first_responses2 = first_responses2['results']
+    URL2 = "https://api.foursquare.com/v3/places/search?ll=41.8781%2C-87.6298&query=restaurant&categories=13000&fields=rating,name,stats&limit=50&radius=60000"
 
-restaurants1 = []
-for rest in first_responses:
-    restaurants1.append(rest)
+    headers2 = {
+        "Accept": "application/json",
+        "Authorization": "fsq3XX8Bpj7/mc5IfDMBIMy3X8NXQszNg8FkBdFPlg3cHaw="
+    }
+
+    response2 = requests.get(url = URL2, headers=headers2)
+    first_responses2 = (json.loads(response2.text))
+
+
+    resp_headers = response.headers
+    link = resp_headers['Link'][1:76]
+    link = link+"41.8781%2C-87.6298&limit=50&fields=rating,name,stats&categories=13000&radius=20000&query=restaurant"
+    second_response = requests.get(url = link, headers = headers)
+    second_responses = json.loads(second_response.text)
+    first_responses = first_responses['results']
+    second_responses = second_responses['results']
+    first_responses2 = first_responses2['results']
+
+    restaurants = []
+    for rest in first_responses:
+        restaurants.append(rest)
     
-restaurants2 = []
-for rest in second_responses:
-    restaurants2.append(rest)
+    for rest in second_responses:
+        restaurants.append(rest)
 
-restaurants3 = []
-for rest in first_responses2:
-    restaurants3.append(rest)
+    for rest in first_responses2:
+        restaurants.append(rest)
 
-
-
-
-group1 = restaurants1[0:24]
-group2= restaurants1[25:]
-group3 = restaurants2[0:24]
-group4= restaurants2[25:]
-group5 = restaurants3[0:24]
-group6= restaurants3[25:]
+    name_lst = []
+    rating_lst = []
+    review_num = []
 
 
 
-cur.execute('CREATE TABLE IF NOT EXISTS Ratings (name TEXT PRIMARY KEY, rating FLOAT, total_ratings INTEGER)')
-for restaurant in group1:
-   name = restaurant['name']
-   rating = restaurant['rating']
-   rating = rating/2
-   totratings = restaurant['stats']['total_ratings']
-   cur.execute('INSERT OR IGNORE INTO Ratings (name, rating, total_ratings) VALUES (?,?,?)', (name, rating, totratings))
-for restaurant in group2:
-   name = restaurant['name']
-   rating = restaurant['rating']
-   rating = rating/2
-   totratings = restaurant['stats']['total_ratings']
-   cur.execute('INSERT OR IGNORE INTO Ratings (name, rating, total_ratings) VALUES (?,?,?)', (name, rating, totratings))
-for restaurant in group3:
-   name = restaurant['name']
-   rating = restaurant['rating']
-   rating = rating/2
-   totratings = restaurant['stats']['total_ratings']
-   cur.execute('INSERT OR IGNORE INTO Ratings (name, rating, total_ratings) VALUES (?,?,?)', (name, rating, totratings))
-for restaurant in group4:
-   name = restaurant['name']
-   rating = restaurant['rating']
-   rating = rating/2
-   totratings = restaurant['stats']['total_ratings']
-   cur.execute('INSERT OR IGNORE INTO Ratings (name, rating, total_ratings) VALUES (?,?,?)', (name, rating, totratings))
-for restaurant in group5:
-   name = restaurant['name']
-   rating = restaurant['rating']
-   rating = rating/2
-   totratings = restaurant['stats']['total_ratings']
-   cur.execute('INSERT OR IGNORE INTO Ratings (name, rating, total_ratings) VALUES (?,?,?)', (name, rating, totratings))
-for restaurant in group6:
-   name = restaurant['name']
-   rating = restaurant['rating']
-   rating = rating/2
-   totratings = restaurant['stats']['total_ratings']
-   cur.execute('INSERT OR IGNORE INTO Ratings (name, rating, total_ratings) VALUES (?,?,?)', (name, rating, totratings))
+    cur.execute('CREATE TABLE IF NOT EXISTS Ratings (name TEXT PRIMARY KEY, rating FLOAT, total_ratings INTEGER)')
 
-conn.commit()
+    id = 0
+    idList = []
+    for restaurant in restaurants:
+        name_lst.append(restaurant['name'])
+        rating = restaurant['rating']
+        rating = rating/2
+        rating_lst.append(rating)
+        idList.append(id)
+        review_num.append(restaurant['stats']['total_ratings'])
+        id += 1
 
-conn.close()
 
-#Foursquare API Visualization#
+    count2 = 0
+    for i in range(len(idList)):
+        if count2 == 25:
+            break
+        cur.execute("INSERT OR IGNORE INTO Ratings (name,rating,total_ratings) VALUES (?,?,?)",(name_lst[i], rating_lst[i], review_num[i]))
+        if cur.rowcount == 1:
+            count2 += 1
+            print(name_lst[i])
+    
+    
+    conn.commit()
+    conn.close()
+    return(rating_lst)
 
-import numpy as np
-import matplotlib.pyplot as plt
- 
-  
-# creating the dataset
-data = {'1/4.7': 517, '2/4.7': 283, '3/4.65': 139, '4/4.6': 108, '5/4.5': 108, '124/3.55': 23, '125/3.55': 32, '126/3.5': 16, '127/3.5': 3, '128/3.5': 3}
-rating = list(data.keys())
-total_ratings = list(data.values())
-  
-fig = plt.figure(figsize = (10, 5))
- 
-# creating the bar plot
-plt.bar(rating, total_ratings, color ='green',
-        width = 0.5)
- 
-plt.xlabel('Rank / Rating', fontsize = 15)
-plt.ylabel('Rating Count', fontsize = 15)
-plt.title('Rating vs. Rating Count in Top 5 vs. Bottom 5 Ranked Restaurants')
-plt.show()
+def Histogram():
+    data = {'Ratings': APIsetup()}
+    df = pd.DataFrame(data)
+    plot = sns.histplot(data = df)
+    plot.set(xlabel='Ratings', ylabel='Frequency', title = 'Restaurant Count For Each Rating')
+    plt.show()
+
+
+            
+
+def main():
+    APIsetup()
+    #Histogram()
+    
+
+
+if __name__ == "__main__":
+    main()
