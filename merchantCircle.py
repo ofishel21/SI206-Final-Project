@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import sqlite3
 import os
+import matplotlib.pyplot as plt
+import pandas as pd
 
 def setUpDatabase(db):
     '''takes in database name (restaurants.db) as parameter and returns the connection and curser for the database'''
@@ -47,6 +49,54 @@ def merchantCircleTable(businesses, cur, conn):
 
     conn.commit()
 
+def barhr():
+    path = os.path.dirname(os.path.abspath(__file__))
+    conn = sqlite3.connect(path+'/'+'206Project.db')
+    cur = conn.cursor()
+
+    #Getting Data
+    cur.execute("SELECT reviewCount FROM restaurants WHERE reviewCount = 1")
+    one = len(cur.fetchall())
+
+    cur.execute("SELECT reviewCount FROM restaurants WHERE reviewCount = 2")
+    two = len(cur.fetchall())
+
+    cur.execute("SELECT reviewCount FROM restaurants WHERE reviewCount = 3")
+    three = len(cur.fetchall())
+
+    cur.execute("SELECT reviewCount FROM restaurants WHERE reviewCount = 4")
+    four = len(cur.fetchall())
+
+    cur.execute("SELECT reviewCount FROM restaurants WHERE reviewCount >= 5")
+    above = len(cur.fetchall())
+
+    data = {'Restaurant Count': [one, two, three, four, above]}
+    df = pd.DataFrame(data,columns=['Restaurant Count'], index = ['1','2','3','4','Above 5'])
+
+
+    # Visualization
+
+    #Font
+    plt.rcParams['font.family'] = 'sans-serif'
+    plt.rcParams['font.sans-serif'] = 'Helvetica'
+
+    # set the style of the axes and the text color
+    plt.rcParams['axes.edgecolor']='#333F4B'
+    plt.rcParams['axes.linewidth']=0.8
+    plt.rcParams['xtick.color']='#333F4B'
+    plt.rcParams['ytick.color']='#333F4B'
+    plt.rcParams['text.color']='#333F4B'
+
+    #Setting up Horizontal Bar Chart
+    df.plot.barh()
+
+
+    plt.title('Amount of Restaurants With Specific Rating Counts')
+    plt.ylabel('Rating Count')
+    plt.xlabel('Amount of Restaurants')
+    plt.show()
+
+
 
 def main():
     cur, conn = setUpDatabase('206Project.db')
@@ -54,12 +104,15 @@ def main():
         businesses = extract(f'https://www.merchantcircle.com/mi-ann-arbor/food-and-dining/restaurants?start={x}#hubResults')
     merchantCircleTable(businesses, cur, conn)
 
+
+    #Uncomment barh() below when you want to see the visualization
+    # barhr()
+
     conn.close()
     print("program finished")
 
 if __name__ == "__main__":
     main()
-
 
 
 
